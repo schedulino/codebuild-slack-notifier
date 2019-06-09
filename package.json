@@ -10,6 +10,7 @@
     "test": "tslint --project . && jest",
     "lint": "tslint --project .",
     "deploy": "serverless deploy",
+    "deploy:f": "sls deploy function -f PostUpdateToSlack -v",
     "sls": "sls",
     "logs:tools:PostUpdateToSlack": "sls logs -f PostUpdateToSlack --region eu-west-1 --stage tools --startTime 10m -t"
   },

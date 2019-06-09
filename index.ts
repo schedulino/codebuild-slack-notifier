@@ -8,12 +8,12 @@ import { Channel, ChannelsResult, Message } from './slack';
 export const messageCache = new Map<string, Message>();
 
 export const isCodePipelineEvent = (
-  event: CodeBuildEvent | CodePipelineEvent,
+    event: CodeBuildEvent | CodePipelineEvent,
 ): event is CodePipelineEvent => {
   return (
-    event['detail-type'] === 'CodePipeline Action Execution State Change' ||
-    event['detail-type'] === 'CodePipeline Pipeline Execution State Change' ||
-    event['detail-type'] === 'CodePipeline Stage Execution State Change'
+      event['detail-type'] === 'CodePipeline Action Execution State Change' ||
+      event['detail-type'] === 'CodePipeline Pipeline Execution State Change' ||
+      event['detail-type'] === 'CodePipeline Stage Execution State Change'
   );
 };
 
@@ -28,9 +28,9 @@ export const getProjectName = (event: CodeBuildEvent | CodePipelineEvent) => {
 };
 
 export const handler: Handler = async (
-  event: CodeBuildEvent | CodePipelineEvent,
-  _context: Context,
-  _callback: Callback | undefined,
+    event: CodeBuildEvent | CodePipelineEvent,
+    _context: Context,
+    _callback: Callback | undefined,
 ) => {
   try {
     const indentLevel = 2;
@@ -40,11 +40,11 @@ export const handler: Handler = async (
 
     // Get list of channels to notify
     const notifyChannels = (await ssm
-      .getParameter({
-        Name: `/codebuild-slack-notifier/${projectName}_channels`,
-        WithDecryption: false,
-      })
-      .promise()).Parameter;
+        .getParameter({
+          Name: `/codebuild-slack-notifier/${projectName}_channels`,
+          WithDecryption: false,
+        })
+        .promise()).Parameter;
 
     // console.log(`notifyChannels - /codebuild-slack-notifier/${projectName}_channels`);
     // console.log(JSON.stringify(notifyChannels, null, indentLevel));
@@ -59,11 +59,11 @@ export const handler: Handler = async (
 
     // Connect to slack
     const token = (await ssm
-      .getParameter({
-        Name: `/codebuild-slack-notifier/slack_token`,
-        WithDecryption: true,
-      })
-      .promise()).Parameter;
+        .getParameter({
+          Name: `/codebuild-slack-notifier/slack_token`,
+          WithDecryption: true,
+        })
+        .promise()).Parameter;
 
     // console.log(`token - /codebuild-slack-notifier/slack_token`);
     // console.log(JSON.stringify(token, null, indentLevel));
@@ -88,19 +88,21 @@ export const handler: Handler = async (
         return handleCodeBuildEvent(event, slack, channel);
       }
     });
-    Promise.all(requests).then(r => {
-      console.log(JSON.stringify(r.filter(i => i != null), null, indentLevel));
-      // Add all sent messages to the cache
-      /* r.forEach(m => {
-        if (m) {
-          messageCache.set([m.channel, buildId(event)].join(':'), {
-            ...m.message,
-            ts: m.ts,
-          });
-        }
-      }); */
-      // console.log('messageCache after', messageCache);
-    });
+    // Promise.all(requests).then(r => {
+    //   console.log(JSON.stringify(r.filter(i => i != null), null, indentLevel));
+    // Add all sent messages to the cache
+    /* r.forEach(m => {
+      if (m) {
+        messageCache.set([m.channel, buildId(event)].join(':'), {
+          ...m.message,
+          ts: m.ts,
+        });
+      }
+    }); */
+    // console.log('messageCache after', messageCache);
+    // });
+    const responses = await Promise.all(requests);
+    console.log(JSON.stringify(responses.filter(r => r != null), null, indentLevel));
   }
   catch (err) {
     console.log('An Error Occurred:', err.message);

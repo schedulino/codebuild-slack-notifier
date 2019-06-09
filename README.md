@@ -4,7 +4,9 @@ AWS Lambda to send Slack notifications for CodeBuild events.
 
 ## Install
 
-A valid Slack oauth token needs to be stored as a secure string in the SSM parameter store as `/codebuild-slack-notifier/slack_token`.
+A valid Slack oauth token needs to be stored as a secure string in the SSM parameter store as `/codebuild-slack-notifier/slack_token` and also valid Slack channels needs to be stored as a string in the SSM parameter store as `/codebuild-slack-notifier/${projectName}_channels`.
+
+> NOTE: The slack oauth needs to have follow permission scopes: `channels:history`, `channels:read`, `chat:write:bot`
 
 Then run:
 
